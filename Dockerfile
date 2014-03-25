@@ -24,6 +24,7 @@ ADD initial_data.json /var/lib/graphite/webapp/graphite/initial_data.json
 ADD local_settings.py /var/lib/graphite/webapp/graphite/local_settings.py
 ADD carbon.conf /var/lib/graphite/conf/carbon.conf
 ADD storage-schemas.conf /var/lib/graphite/conf/storage-schemas.conf
+ADD graphite_wsgi.py /var/lib/graphite/conf/graphite_wsgi.py
 RUN mkdir -p /var/lib/graphite/storage/whisper
 RUN touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index
 RUN chown -R nginx /var/lib/graphite/storage
