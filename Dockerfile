@@ -30,6 +30,9 @@ RUN chown -R nginx /var/lib/graphite/storage
 RUN chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper
 RUN chmod 0664 /var/lib/graphite/storage/graphite.db
 RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
+RUN mkdir -p /var/log/graphite
+RUN chown nginx /var/log/graphite
+RUN chmod 0770 /var/log/graphite
 
 # Nginx
 EXPOSE 80
