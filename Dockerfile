@@ -5,7 +5,7 @@ RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-
 
 # Install required packages
 RUN yum -y install gcc python-devel pycairo pyOpenSSL python-memcached \
-    bitmap bitmap-fonts python-pip python-twistedpython-django-tagging \
+    bitmap bitmap-fonts python-pip python-twisted python-django-tagging \
     python-sqlite2 python-memcached python-simplejson python-gunicorn \
     supervisor nginx
 
