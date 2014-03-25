@@ -7,13 +7,21 @@ RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-
 RUN yum -y install gcc python-devel pycairo pyOpenSSL python-memcached \
     bitmap bitmap-fonts python-pip python-django-tagging \
     python-sqlite2 python-rrdtool memcached python-simplejson python-gunicorn \
-    supervisor nginx
+    supervisor openssl-server sudo nginx
 
 # Use pip to install graphite, carbon, and deps
 RUN pip-python install whisper
 RUN pip-python install Twisted==11.1.0
 RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/lib" carbon
 RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web
+
+RUN mkdir -p /var/run/sshd
+RUN chmod -rx /var/run/sshd
+
+RUN useradd -d /home/graphite -m -s /bin/bash graphite
+RUN echo graphite:graphite | chpasswd
+RUN echo 'graphite ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/graphite
+RUN chmod 0440 /etc/sudoers.d/graphite
 
 # Add system service config
 ADD nginx.conf /etc/nginx/nginx.conf
@@ -40,4 +48,6 @@ EXPOSE 2004
 # Carbon cache query port
 EXPOSE 7002
 
-CMD ["/usr/bin/supervisord"]
+ADD start.sh /tmp/start.sh
+RUN chmod +x /tmp/start.sh
+ENTRYPOINT /tmp/start.sh
