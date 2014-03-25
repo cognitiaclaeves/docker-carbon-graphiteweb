@@ -5,12 +5,12 @@ RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-
 
 # Install required packages
 RUN yum -y install gcc python-devel pycairo pyOpenSSL python-memcached \
-    bitmap bitmap-fonts python-pip python-twisted python-django-tagging \
+    bitmap bitmap-fonts python-pip python-django-tagging \
     python-sqlite2 python-rrdtool memcached python-simplejson python-gunicorn \
     supervisor nginx
 
 # Use pip to install graphite, carbon, and deps
-RUN pip-python install whisper
+RUN pip-python install whisper twisted
 RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/lib" carbon
 RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web
 

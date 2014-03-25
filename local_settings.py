@@ -41,4 +41,4 @@ TIME_ZONE = 'UTC'
 #DATABASE_HOST = 'mysql.mycompany.com'
 #DATABASE_PORT = '3306'
 
-STATIC_URL=/usr/lib/python2.6/site-packages/django/contrib/admin/static/admin
+STATIC_URL='/usr/lib/python2.6/site-packages/django/contrib/admin/static/admin'
