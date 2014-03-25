@@ -10,7 +10,9 @@ RUN yum -y install gcc python-devel pycairo pyOpenSSL python-memcached \
     supervisor nginx
 
 # Use pip to install graphite, carbon, and deps
-RUN pip-python install whisper carbon graphite-web
+RUN pip-python install whisper
+RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/lib" carbon
+RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web
 
 # Add system service config
 #ADD ./nginx.conf /etc/nginx/nginx.conf
