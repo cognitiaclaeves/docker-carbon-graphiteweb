@@ -4,7 +4,7 @@ MAINTAINER Stephen Price <steeef@gmail.com>
 RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 # Install required packages
-RUN yum -y install python-pip nginx
+RUN yum -y install bitmap bitmap-fonts python-pip nginx
 
 # Use pip to install graphite, carbon, and deps
 RUN pip-python install whisper carbon graphite-web
