@@ -4,11 +4,10 @@ MAINTAINER Stephen Price <steeef@gmail.com>
 RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 # Install required packages
-RUN yum -y install python-whisper python-carbon python-memcached \
-    python-django python-django-tagging pycairo python-simplejson \
-    python-sqlite2 bitmap bitmap-fonts-compat python-crypto \
-    pyOpenSSL python-txamqp graphite-web nginx Django zope python-devel \
-    python-txamqp python-twisted supervisor python-gunicorn
+RUN yum -y install python-pip nginx
+
+# Use pip to install graphite, carbon, and deps
+RUN pip-python install whisper carbon graphite-web
 
 # Add system service config
 #ADD ./nginx.conf /etc/nginx/nginx.conf
