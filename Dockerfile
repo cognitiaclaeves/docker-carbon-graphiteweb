@@ -47,6 +47,8 @@ EXPOSE 2003
 EXPOSE 2004
 # Carbon cache query port
 EXPOSE 7002
+# ssh
+EXPOSE 22
 
 ADD start.sh /tmp/start.sh
 RUN chmod +x /tmp/start.sh
