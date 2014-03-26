@@ -9,6 +9,7 @@ This image contains a sensible default configuration of graphite and
 carbon-cache. Starting this container will, by default, bind the the following
 host ports:
 
+- `22`: ssh for troubleshooting
 - `80`: the graphite web interface
 - `2003`: the carbon-cache line receiver (the standard graphite protocol)
 - `2004`: the carbon-cache pickle receiver
@@ -16,13 +17,10 @@ host ports:
 
 With this image, you can get up and running with graphite by simply running:
 
-    docker run -d steeef/graphite-centos
+    docker run -d -P -e -e SECRET_KEY='random-secret-key' steeef/graphite-centos
 
-If you already have services running on the host on one or more of these ports,
-you may wish to allow docker to assign random ports on the host. You can do this
-easily by running:
-
-    docker run -p 80 -p 2003 -p 2004 -p 7002 -d steeef/graphite-centos
+If you want to allow access to SSH, you'll also need to pass '-t' for
+pseudo-tty.
 
 You can log into the administrative interface of graphite-web (a Django
 application) with the username `admin` and password `admin`. These passwords can
