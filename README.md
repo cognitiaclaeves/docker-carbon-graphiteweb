@@ -1,6 +1,6 @@
 ## Graphite + Carbon
 
-Forked from: https://github.com/nickstenning/dockerfiles/tree/master/graphite
+Forked from: https://github.com/steeef/dockerfiles
 
 An all-in-one image running graphite and carbon-cache, Running on CentOS 6.x
 (installed from EPEL).
@@ -9,7 +9,6 @@ This image contains a sensible default configuration of graphite and
 carbon-cache. Starting this container will, by default, bind the the following
 host ports:
 
-- `22`: ssh for troubleshooting
 - `80`: the graphite web interface
 - `2003`: the carbon-cache line receiver (the standard graphite protocol)
 - `2004`: the carbon-cache pickle receiver
@@ -17,7 +16,7 @@ host ports:
 
 With this image, you can get up and running with graphite by simply running:
 
-    docker run -d -P -e -e SECRET_KEY='random-secret-key' steeef/graphite-centos
+    docker run -d -P -e SECRET_KEY='random-secret-key' abezhenar/graphite-centos
 
 If you want to allow access to SSH, you'll also need to pass '-t' for
 pseudo-tty.
