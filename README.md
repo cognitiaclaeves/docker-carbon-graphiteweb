@@ -2,7 +2,7 @@
 
 Forked from: https://github.com/steeef/dockerfiles
 
-An all-in-one image running graphite and carbon-cache, Running on CentOS 6.x
+An all-in-one image running graphite and carbon-cache, Running on CentOS 7.x
 (installed from EPEL).
 
 This image contains a sensible default configuration of graphite and
