@@ -1,19 +1,55 @@
-FROM centos:latest
-MAINTAINER Stephen Price <steeef@gmail.com>
+FROM centos:centos7
+MAINTAINER Alexander Bezhenar <bezhenar.alexander@gmail.com>
 
-RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+#Enable the EPEL (Extra Packages for Enterprise Linux) repository
+RUN yum -y install epel-release \
+ && yum -y update
 
-# Install required packages
-RUN yum -y install gcc python-devel pycairo pyOpenSSL python-memcached \
-    bitmap bitmap-fonts python-pip python-django-tagging \
-    python-sqlite2 python-rrdtool memcached python-simplejson python-gunicorn \
-    supervisor openssh-server sudo nginx
+#Install the required applications, including Python-related tools and the Apache web server
+RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel httpd mod_wsgi \
+ && pip install --upgrade pip
 
-# Use pip to install graphite, carbon, and deps
-RUN pip-python install whisper
-RUN pip-python install Twisted==11.1.0
-RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/lib" carbon
-RUN pip-python install --install-option="--prefix=/var/lib/graphite" --install-option="--install-lib=/var/lib/graphite/webapp" graphite-web
+#Get the latest source files for Graphite and Carbon from the GitHub
+RUN cd /usr/local/src \
+ && git clone https://github.com/graphite-project/graphite-web.git \
+  && git clone https://github.com/graphite-project/carbon.git
+
+#Install project dependencies
+RUN pip install -r /usr/local/src/graphite-web/requirements.txt \
+ && pip install --upgrade whisper
+
+#(Optional) install python-ldap. Without it, you will not be able to use LDAP authentication in the graphite webapp
+RUN yum -y install openldap-devel \
+ && pip install python-ldap
+
+#(Optional) install python-rrdtool. This module is required for reading RRD
+RUN yum -y install python-rrdtool
+
+#to check dependencies use:
+##python /usr/local/src/graphite-web/check-dependencies.py
+
+#Install Carbon
+RUN cd /usr/local/src/carbon/ \
+ && python setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/lib
+
+#Install the web application
+RUN cd /usr/local/src/graphite-web/ \
+ && python setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/webapp
+
+## Add graphite config
+#ADD initial_data.json /var/lib/graphite/webapp/graphite/initial_data.json
+#ADD local_settings.py /var/lib/graphite/webapp/graphite/local_settings.py
+ADD carbon.conf /var/lib/graphite/conf/carbon.conf
+#ADD storage-schemas.conf /var/lib/graphite/conf/storage-schemas.conf
+#RUN mkdir -p /var/lib/graphite/storage/whisper
+#RUN touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index
+#RUN chown -R nginx /var/lib/graphite/storage
+#RUN chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper
+#RUN chmod 0664 /var/lib/graphite/storage/graphite.db
+#RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
+
+
+#########################################################################
 
 RUN mkdir -p /var/run/sshd
 RUN chmod -rx /var/run/sshd
