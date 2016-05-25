@@ -9,7 +9,8 @@ RUN yum -y install epel-release \
 RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel \
     pyOpenSSL bitmap bitmap-fonts python-sqlite2 \
     supervisor openssh-server sudo nginx \
- && pip install --upgrade pip
+ && pip install --upgrade pip \
+ && pip install Django==1.6.11
 
 #Get the latest source files for Graphite and Carbon from the GitHub
 RUN cd /usr/local/src \
