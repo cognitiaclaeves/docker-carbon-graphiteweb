@@ -19,7 +19,9 @@ With this image, you can get up and running with graphite by simply running:
 `docker pull abezhenar/graphite-centos7`
     
 `docker run -d -P -e SECRET_KEY='random-secret-key' abezhenar/graphite-centos7`
-    or
+
+or
+
 `docker run --name graphite-centos7 -d -P abezhenar/graphite-centos7`
 
 If you want to allow access to SSH, you'll also need to pass '-t' for
