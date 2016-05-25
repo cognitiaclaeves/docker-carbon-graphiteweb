@@ -66,7 +66,8 @@ RUN mkdir -p /var/lib/graphite/storage/whisper \
 ENV PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH \
     GRAPHITE_PATH=/var/lib/graphite \
     PYTHONPATH=$PYTHONPATH:$GRAPHITE_ROOT/webapp \
-    SECRET_KEY no-so-secret # Fix for your own site!
+    SECRET_KEY=no-so-secret
+    # Fix SECRET_KEY for your own site!
 RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
 
 # Nginx
