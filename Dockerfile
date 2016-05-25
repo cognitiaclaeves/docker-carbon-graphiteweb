@@ -5,8 +5,10 @@ MAINTAINER Alexander Bezhenar <bezhenar.alexander@gmail.com>
 RUN yum -y install epel-release \
  && yum -y update
 
-#Install the required applications, including Python-related tools and the Apache web server
-RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel httpd mod_wsgi \
+#Install the required applications, including Python-related tools and the uWSGI with nginx
+RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel \
+    pyOpenSSL bitmap bitmap-fonts python-sqlite2 python-simplejson python-gunicorn \
+    supervisor openssh-server sudo nginx \
  && pip install --upgrade pip
 
 #Get the latest source files for Graphite and Carbon from the GitHub
@@ -36,21 +38,8 @@ RUN cd /usr/local/src/carbon/ \
 RUN cd /usr/local/src/graphite-web/ \
  && python setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/webapp
 
-## Add graphite config
-#ADD initial_data.json /var/lib/graphite/webapp/graphite/initial_data.json
-#ADD local_settings.py /var/lib/graphite/webapp/graphite/local_settings.py
-ADD carbon.conf /var/lib/graphite/conf/carbon.conf
-#ADD storage-schemas.conf /var/lib/graphite/conf/storage-schemas.conf
-#RUN mkdir -p /var/lib/graphite/storage/whisper
-#RUN touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index
-#RUN chown -R nginx /var/lib/graphite/storage
-#RUN chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper
-#RUN chmod 0664 /var/lib/graphite/storage/graphite.db
-#RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
 
-
-#########################################################################
-
+###########Levak
 RUN mkdir -p /var/run/sshd
 RUN chmod -rx /var/run/sshd
 
@@ -62,7 +51,7 @@ RUN chmod 0440 /etc/sudoers.d/graphite
 # Add system service config
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD supervisord.conf /etc/supervisord.conf
-#
+
 ## Add graphite config
 ADD initial_data.json /var/lib/graphite/webapp/graphite/initial_data.json
 ADD local_settings.py /var/lib/graphite/webapp/graphite/local_settings.py
@@ -76,15 +65,15 @@ RUN chmod 0664 /var/lib/graphite/storage/graphite.db
 RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
 
 # Nginx
-EXPOSE 80
+EXPOSE 30080:80
 # Carbon line receiver port
-EXPOSE 2003
+EXPOSE 32003:2003
 # Carbon pickle receiver port
-EXPOSE 2004
+EXPOSE 32004:2004
 # Carbon cache query port
-EXPOSE 7002
+EXPOSE 37002:7002
 # ssh
-EXPOSE 22
+#EXPOSE 30022:22
 
 ADD start.sh /tmp/start.sh
 RUN chmod +x /tmp/start.sh
