@@ -57,16 +57,16 @@ ADD initial_data.json /var/lib/graphite/webapp/graphite/initial_data.json
 ADD local_settings.py /var/lib/graphite/webapp/graphite/local_settings.py
 ADD carbon.conf /var/lib/graphite/conf/carbon.conf
 ADD storage-schemas.conf /var/lib/graphite/conf/storage-schemas.conf
-RUN mkdir -p /var/lib/graphite/storage/whisper
-RUN touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index
-RUN chown -R nginx /var/lib/graphite/storage
-RUN chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper
-RUN chmod 0664 /var/lib/graphite/storage/graphite.db
+RUN mkdir -p /var/lib/graphite/storage/whisper \
+ && touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index \
+ && chown -R nginx /var/lib/graphite/storage \
+ && chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper \
+ && chmod 0664 /var/lib/graphite/storage/graphite.db
 #RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
-ENV PATH /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
-ENV GRAPHITE_PATH /var/lib/graphite
-ENV PYTHONPATH $PYTHONPATH:$GRAPHITE_ROOT/webapp
-ENV SECRET_KEY no-so-secret # Fix for your own site!
+ENV PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH \
+    GRAPHITE_PATH=/var/lib/graphite \
+    PYTHONPATH=$PYTHONPATH:$GRAPHITE_ROOT/webapp \
+    SECRET_KEY no-so-secret # Fix for your own site!
 RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
 
 # Nginx
