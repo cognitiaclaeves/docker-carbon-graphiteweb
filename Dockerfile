@@ -7,14 +7,14 @@ RUN yum -y install epel-release \
 
 #Install the required applications, including Python-related tools and the uWSGI with nginx
 RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel \
-    pyOpenSSL bitmap bitmap-fonts python-sqlite2 python-simplejson python-gunicorn \
+    pyOpenSSL bitmap bitmap-fonts python-sqlite2 \
     supervisor openssh-server sudo nginx \
  && pip install --upgrade pip
 
 #Get the latest source files for Graphite and Carbon from the GitHub
 RUN cd /usr/local/src \
  && git clone https://github.com/graphite-project/graphite-web.git \
-  && git clone https://github.com/graphite-project/carbon.git
+ && git clone https://github.com/graphite-project/carbon.git
 
 #Install project dependencies
 RUN pip install -r /usr/local/src/graphite-web/requirements.txt \
@@ -40,13 +40,13 @@ RUN cd /usr/local/src/graphite-web/ \
 
 
 ###########Levak
-RUN mkdir -p /var/run/sshd
-RUN chmod -rx /var/run/sshd
+RUN mkdir -p /var/run/sshd \
+ && chmod -rx /var/run/sshd
 
-RUN useradd -d /home/graphite -m -s /bin/bash graphite
-RUN echo graphite:graphite | chpasswd
-RUN echo 'graphite ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/graphite
-RUN chmod 0440 /etc/sudoers.d/graphite
+RUN useradd -d /home/graphite -m -s /bin/bash graphite \
+ && echo graphite:graphite | chpasswd \
+ && echo 'graphite ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/graphite \
+ && chmod 0440 /etc/sudoers.d/graphite
 
 # Add system service config
 ADD nginx.conf /etc/nginx/nginx.conf
@@ -62,7 +62,12 @@ RUN touch /var/lib/graphite/storage/graphite.db /var/lib/graphite/storage/index
 RUN chown -R nginx /var/lib/graphite/storage
 RUN chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper
 RUN chmod 0664 /var/lib/graphite/storage/graphite.db
-RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
+#RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
+ENV PATH /bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+ENV GRAPHITE_PATH /var/lib/graphite
+ENV PYTHONPATH $PYTHONPATH:$GRAPHITE_ROOT/webapp
+ENV SECRET_KEY no-so-secret # Fix for your own site!
+RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
 
 # Nginx
 EXPOSE 30080:80
