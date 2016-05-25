@@ -9,14 +9,18 @@ This image contains a sensible default configuration of graphite and
 carbon-cache. Starting this container will, by default, bind the the following
 host ports:
 
-- `80`: the graphite web interface
-- `2003`: the carbon-cache line receiver (the standard graphite protocol)
-- `2004`: the carbon-cache pickle receiver
-- `7002`: the carbon-cache query port (used by the web interface)
+- `80 to 30080`: the graphite web interface
+- `2003 to 32003`: the carbon-cache line receiver (the standard graphite protocol)
+- `2004 to 32004`: the carbon-cache pickle receiver
+- `7002 to 37002`: the carbon-cache query port (used by the web interface)
 
 With this image, you can get up and running with graphite by simply running:
 
-    docker run -d -P -e SECRET_KEY='random-secret-key' abezhenar/graphite-centos
+`docker pull abezhenar/graphite-centos7`
+    
+`docker run -d -P -e SECRET_KEY='random-secret-key' abezhenar/graphite-centos7`
+    or
+`docker run --name graphite-centos7 -d -P abezhenar/graphite-centos7`
 
 If you want to allow access to SSH, you'll also need to pass '-t' for
 pseudo-tty.
@@ -45,5 +49,3 @@ resulting in whisper files of approximately 2.5MiB.
 
     10s:8d,1m:31d,10m:1y,1h:5y
 
-For more information, see [the
-Docker Index page](https://index.docker.io/u/steeef/graphite-centos).
