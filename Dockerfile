@@ -69,7 +69,9 @@ ENV PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH \
     PYTHONPATH=$PYTHONPATH:$GRAPHITE_ROOT/webapp \
     SECRET_KEY=no-so-secret
     # Fix SECRET_KEY for your own site!
-RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
+#it works for django 1.9# RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
+#but for django 1.6 we need next#
+RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py syncdb --noinput --settings=graphite.settings
 
 # Nginx
 EXPOSE 30080:80
