@@ -24,6 +24,10 @@ or
 
 `docker run --name graphite-centos7 -d -P abezhenar/graphite-centos7`
 
+or (prefered one)
+
+`docker run --name graphite-centos7 -d -p 30080:80 -p 32003:2003 -p 32004:2004 -p 37002:7002 abezhenar/graphite-centos7`
+
 If you want to allow access to SSH, you'll also need to pass '-t' for
 pseudo-tty.
 
