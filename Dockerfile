@@ -36,15 +36,6 @@ RUN wget -v --no-verbose -O /tmp/whisper.tar.gz https://github.com/graphite-proj
 #to check dependencies use:
 ##python /usr/local/src/graphite-web/check-dependencies.py
 
-#Install Carbon
-RUN cd /usr/local/src/carbon/ \
- && python setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/lib
-
-#Install the web application
-RUN cd /usr/local/src/graphite-web/ \
- && python setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/webapp
-
-
 ###########Levak
 RUN mkdir -p /var/run/sshd \
  && chmod -rx /var/run/sshd
