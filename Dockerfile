@@ -6,27 +6,32 @@ RUN yum -y install epel-release \
  && yum -y update
 
 #Install the required applications, including Python-related tools and the uWSGI with nginx
-RUN yum -y install git gcc python-pip python-devel pycairo libffi-devel \
+RUN yum -y install wget gcc python-pip python-devel pycairo libffi-devel \
     pyOpenSSL bitmap bitmap-fonts python-sqlite2 \
     supervisor openssh-server sudo nginx \
- && pip install --upgrade pip \
- && pip install Django==1.6.11
+ && pip install --upgrade pip
 
-#Get the latest source files for Graphite and Carbon from the GitHub
-RUN cd /usr/local/src \
- && git clone https://github.com/graphite-project/graphite-web.git \
- && git clone https://github.com/graphite-project/carbon.git
-
-#Install project dependencies
-RUN pip install -r /usr/local/src/graphite-web/requirements.txt \
- && pip install --upgrade whisper
-
-#(Optional) install python-ldap. Without it, you will not be able to use LDAP authentication in the graphite webapp
-RUN yum -y install openldap-devel \
- && pip install python-ldap
-
-#(Optional) install python-rrdtool. This module is required for reading RRD
-RUN yum -y install python-rrdtool
+#Get the v 0.9.15 source files for Graphite and Carbon from the GitHub
+RUN wget -v --no-verbose -O /tmp/whisper.tar.gz https://github.com/graphite-project/whisper/archive/0.9.15.tar.gz \
+ && tar -xzf /tmp/whisper.tar.gz --directory=/tmp/ \
+ && cd /tmp/whisper-0.9.15 && /usr/bin/python ./setup.py install \
+ && wget -v  --no-verbose -O /tmp/graphite.tar.gz https://github.com/graphite-project/graphite-web/archive/0.9.15.tar.gz \
+ && tar -xzf /tmp/graphite.tar.gz --directory=/tmp/ \
+ #Install project dependencies
+ && pip install -r /tmp/graphite-web-0.9.15/requirements.txt \
+ && pip install Django==1.4.11 \
+ #(Optional) install python-ldap. Without it, you will not be able to use LDAP authentication in the graphite webapp
+ && yum -y install openldap-devel \
+ && pip install python-ldap \
+ #(Optional) install python-rrdtool. This module is required for reading RRD
+ && yum -y install python-rrdtool \
+ #Install the web application
+ && cd /tmp/graphite-web-0.9.15 && /usr/bin/python ./setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/webapp \
+ #Install Carbon
+ && wget -v  --no-verbose -O /tmp/carbon.tar.gz https://github.com/graphite-project/carbon/archive/0.9.15.tar.gz \
+ && tar -xzf /tmp/carbon.tar.gz --directory=/tmp/ \
+ && cd /tmp/carbon-0.9.15 && /usr/bin/python ./setup.py install --prefix=/var/lib/graphite --install-lib=/var/lib/graphite/lib \
+ && cd / && rm -rf /tmp/*
 
 #to check dependencies use:
 ##python /usr/local/src/graphite-web/check-dependencies.py
@@ -44,6 +49,7 @@ RUN cd /usr/local/src/graphite-web/ \
 RUN mkdir -p /var/run/sshd \
  && chmod -rx /var/run/sshd
 
+## Add superuser
 RUN useradd -d /home/graphite -m -s /bin/bash graphite \
  && echo graphite:graphite | chpasswd \
  && echo 'graphite ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/graphite \
@@ -63,26 +69,18 @@ RUN mkdir -p /var/lib/graphite/storage/whisper \
  && chown -R nginx /var/lib/graphite/storage \
  && chmod 0775 /var/lib/graphite/storage /var/lib/graphite/storage/whisper \
  && chmod 0664 /var/lib/graphite/storage/graphite.db
-#RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
-ENV PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH \
-    GRAPHITE_PATH=/var/lib/graphite \
-    PYTHONPATH=$PYTHONPATH:$GRAPHITE_ROOT/webapp \
-    SECRET_KEY=no-so-secret
-    # Fix SECRET_KEY for your own site!
-#it works for django 1.9# RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py migrate --noinput --settings=graphite.settings --run-syncdb
-#but for django 1.6 we need next#
-RUN PYTHONPATH=${GRAPHITE_PATH}/webapp/ django-admin.py syncdb --noinput --settings=graphite.settings
+RUN cd /var/lib/graphite/webapp/graphite && python manage.py syncdb --noinput
 
 # Nginx
-EXPOSE 30080:80
+EXPOSE 80
 # Carbon line receiver port
-EXPOSE 32003:2003
+EXPOSE 2003
 # Carbon pickle receiver port
-EXPOSE 32004:2004
+EXPOSE 2004
 # Carbon cache query port
-EXPOSE 37002:7002
+EXPOSE 7002
 # ssh
-#EXPOSE 30022:22
+#EXPOSE 22
 
 ADD start.sh /tmp/start.sh
 RUN chmod +x /tmp/start.sh
