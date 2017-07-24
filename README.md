@@ -1,9 +1,18 @@
 ## Graphite + Carbon
 
-Forked from: https://github.com/steeef/dockerfiles
+Forked from: bezhenar/docker-graphite who
+forked it from: https://github.com/steeef/dockerfiles
 
 An all-in-one image running graphite and carbon-cache, Running on CentOS 7.2-1511
 (installed from EPEL).
+
+Note: This appears to be a good all-in-one, but I've since pulled together various containers
+from different corners of the web to represent what I believe to be a 'best implementation'
+for a containerized stack.
+
+One difference is that I've moved away from using graphite-web in favor or using graphite-api.
+
+---
 
 This image contains a sensible default configuration of graphite and
 carbon-cache. Starting this container will, by default, bind the the following
