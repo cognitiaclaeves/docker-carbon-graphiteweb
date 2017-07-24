@@ -1,14 +1,27 @@
 FROM centos:centos7
-MAINTAINER Alexander Bezhenar <bezhenar.alexander@gmail.com>
+MAINTAINER J.Norment
+# Forked from https://github.com/bezhenar/docker-graphite,
+#     mainted by Alexander Bezhenar <bezhenar.alexander@gmail.com>
+
+# WARNING: This container runs as root!
+# But it was one of the only containers that I could find that was based on centos
+#     and used nginx instead of apache.
+# Might be able to fix this by running in virtual environment?
+# Or the key might be in start.sh:
+#     /usr/bin/supervisord - change this to run as root?
+# OR MAYBE ... it will just run as the nginx user??
 
 #Enable the EPEL (Extra Packages for Enterprise Linux) repository
 RUN yum -y install epel-release \
  && yum -y update
 
+# Q2 Add artifactory
+ADD pip.conf /root/.pip/pip.conf
+
 #Install the required applications, including Python-related tools and the uWSGI with nginx
 RUN yum -y install wget gcc python-pip python-devel pycairo libffi-devel \
     pyOpenSSL bitmap bitmap-fonts python-sqlite2 \
-    supervisor openssh-server sudo nginx \
+    supervisor openssh-server carbon-c-relay sudo nginx \
  && pip install --upgrade pip
 
 #Get the v 0.9.15 source files for Graphite and Carbon from the GitHub
@@ -73,6 +86,9 @@ EXPOSE 7002
 # ssh
 #EXPOSE 22
 
+VOLUME ["/opt/graphite/conf", "/opt/graphite/storage", "/etc/nginx", "/etc/logrotate.d", "/var/log"]
+
 ADD start.sh /tmp/start.sh
 RUN chmod +x /tmp/start.sh
 ENTRYPOINT /tmp/start.sh
+
